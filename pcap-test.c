@@ -5,7 +5,12 @@
 #include <netinet/in.h>
 
 void print_mac(u_int8_t* m) {
-    printf("%02x:%02x:%02x:%02x:%02x:%02x", m[0], m[1], m[2], m[3], m[4], m[5]);
+    for (int i = 0; i < 6; i++) {
+        printf("%02x", m[i]);
+        if (i < 5) {
+            printf(":");
+        }
+    }
 }
 
 void print_payload(const u_char* payload, int len) {
@@ -74,10 +79,8 @@ int main(int argc, char* argv[]) {
 
         struct libnet_tcp_hdr* tcp_hdr = (struct libnet_tcp_hdr*)(packet + LIBNET_ETH_H + (ip_hdr->ip_hl * 4));
 
-        // Print packet information
         printf("\n=== Packet Captured ===\n");
 
-        // Ethernet MAC addresses
         printf("Ethernet MAC\n");
         printf("- Source MAC: ");
         print_mac(eth_hdr->ether_shost);
@@ -85,17 +88,13 @@ int main(int argc, char* argv[]) {
         print_mac(eth_hdr->ether_dhost);
         printf("\n");
 
-        // IP addresses
         printf("IP Address\n");
         printf("- Source IP: %s\n", inet_ntoa(ip_hdr->ip_src));
         printf("- Destination IP: %s\n", inet_ntoa(ip_hdr->ip_dst));
 
-        // TCP ports
         printf("TCP Port\n");
         printf("- Source Port: %d\n", ntohs(tcp_hdr->th_sport));
         printf("- Destination Port: %d\n", ntohs(tcp_hdr->th_dport));
-
-        // uint32_t offset = 14 + (ip_hdr->ip_hl) * 4 + (tcp_hdr->th_off) * 4;
 
         print_payload(packet, header->caplen);
         printf("====================\n");
